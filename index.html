@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parole per la sala – Roots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root {
+  --bg: #F6F7F4;
+  --surface: #FFFFFF;
+  --ink: #1D2B2E;
+  --muted: #566669;
+  --line: #D9DED8;
+  --accent: #17606B;
+  --accent-ink: #FFFFFF;
+  --play: #FFE7A0;
+  --ok: #1E7A45;
+  --no: #B3361F;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101719;
+    --surface: #182125;
+    --ink: #E8EEEC;
+    --muted: #9DB0B2;
+    --line: #2A383C;
+    --accent: #5BC0CF;
+    --accent-ink: #06262B;
+    --play: #5A4A12;
+    --ok: #6CD08F;
+    --no: #FF8A73;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101719;
+  --surface: #182125;
+  --ink: #E8EEEC;
+  --muted: #9DB0B2;
+  --line: #2A383C;
+  --accent: #5BC0CF;
+  --accent-ink: #06262B;
+  --play: #5A4A12;
+  --ok: #6CD08F;
+  --no: #FF8A73;
+  color-scheme: dark;
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--bg);
+  z-index: 10;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.wrap { max-width: 44rem; margin: 0 auto; padding: 0 1.1rem 3rem; }
+
+header { padding: 1.6rem 0 1rem; }
+h1 {
+  font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+.lead { margin: 0; color: var(--muted); max-width: 32rem; }
+
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  margin: 0 -1.1rem;
+  padding: 0.6rem 1.1rem;
+}
+.tabs { display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.1rem; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  font-weight: 600;
+}
+.tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.tools { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; margin: 0.7rem 0 0; }
+.speed { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
+.speed button { min-height: 44px; padding: 0 1rem; border: 0; background: transparent; font-weight: 600; }
+.speed button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.speed-label { color: var(--muted); font-size: 0.95rem; }
+.playall {
+  min-height: 44px;
+  padding: 0 1.1rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.note {
+  margin: 1rem 0 0;
+  padding: 0.8rem 1rem;
+  border-left: 4px solid var(--no);
+  background: var(--surface);
+  font-size: 0.97rem;
+}
+.note[hidden] { display: none; }
+
+h2 {
+  font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif;
+  font-size: 1.6rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 1.6rem 0 0.3rem;
+}
+.intro { margin: 0 0 0.6rem; color: var(--muted); }
+
+ul.rows { list-style: none; margin: 0; padding: 0; }
+ul.rows li { border-top: 1px solid var(--line); padding: 0.55rem 0; display: flex; gap: 0.8rem; align-items: flex-start; }
+ul.rows li:last-child { border-bottom: 1px solid var(--line); }
+.speak {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+}
+.speak svg { width: 22px; height: 22px; }
+.speak:active { background: var(--accent); color: var(--accent-ink); }
+.txt { flex: 1; min-width: 0; }
+.main, .sub {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 0.15rem 0.4rem;
+  margin-left: -0.4rem;
+  border-radius: 6px;
+}
+.main { font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif; font-weight: 500; font-size: 1.3rem; line-height: 1.25; }
+.sub { color: var(--muted); font-size: 1.02rem; }
+.sub.static { cursor: default; }
+.playing { background: var(--play); color: var(--ink); }
+
+.dialogue { margin-top: 2rem; }
+.dialogue h3 { font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif; font-size: 1.25rem; margin: 0 0 0.5rem; }
+.line { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.45rem 0; }
+.line .who { flex: none; width: 5.6rem; font-weight: 600; padding-top: 0.6rem; color: var(--muted); font-size: 0.95rem; }
+.line .main { font-family: "Source Sans 3", system-ui, sans-serif; font-weight: 400; font-size: 1.1rem; }
+
+.ex { margin-top: 1.4rem; }
+.ex h3 { font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif; font-size: 1.25rem; margin: 0 0 0.3rem; }
+.sent { padding: 0.7rem 0; border-top: 1px solid var(--line); display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+.sent .n { color: var(--muted); width: 1.4rem; }
+.sent select {
+  min-height: 44px;
+  font: inherit;
+  padding: 0 0.6rem;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  max-width: 100%;
+}
+.sent.ok select { border-color: var(--ok); }
+.sent.no select { border-color: var(--no); }
+.mark { font-weight: 600; min-width: 5.5rem; }
+.sent.ok .mark { color: var(--ok); }
+.sent.no .mark { color: var(--no); }
+.btn {
+  min-height: 44px;
+  padding: 0 1.2rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.btn.ghost { background: transparent; color: var(--accent); }
+.result { margin: 0.8rem 0 0; font-weight: 600; }
+
+.quiz { margin-top: 2.2rem; padding-top: 1.2rem; border-top: 3px solid var(--ink); }
+.quiz .q { font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif; font-size: 1.3rem; margin: 0.4rem 0 0.8rem; }
+.opts { display: grid; gap: 0.5rem; margin: 0.8rem 0; }
+.opt {
+  min-height: 52px;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 1.1rem;
+}
+.opt.ok { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 16%, var(--surface)); }
+.opt.no { border-color: var(--no); background: color-mix(in srgb, var(--no) 14%, var(--surface)); }
+.progress { color: var(--muted); font-size: 0.95rem; }
+.row-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem; }
+
+.grp { margin-top: 1.8rem; padding-top: 1rem; border-top: 3px solid var(--ink); }
+.grp h3 { font-family: "Bricolage Grotesque", "Source Sans 3", system-ui, sans-serif; font-size: 1.3rem; margin: 0 0 0.3rem; }
+.pics { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 1rem; margin: 0.8rem 0; }
+.fig { display: flex; flex-direction: column; gap: 0.3rem; }
+.pic { display: block; width: 100%; aspect-ratio: 1 / 1; padding: 0; border: 2px solid var(--line); border-radius: 12px; overflow: hidden; background: #F6F1E7; }
+.pic svg, .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pic.ok { border-color: var(--ok); box-shadow: 0 0 0 3px var(--ok); }
+.pic.no { border-color: var(--no); box-shadow: 0 0 0 3px var(--no); }
+.pic.playing { border-color: var(--accent); }
+
+footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.92rem; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Parole per la sala</h1>
+    <p class="lead">Tocca una parola o una frase per ascoltarla in italiano. Poi ripeti ad alta voce.</p>
+  </header>
+
+  <div class="bar">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Argomenti"></div>
+    <div class="tools" id="tools">
+      <span class="speed-label">Velocità</span>
+      <div class="speed" role="group" aria-label="Velocità della voce">
+        <button type="button" id="spNorm" aria-pressed="true">Normale</button>
+        <button type="button" id="spSlow" aria-pressed="false">Lenta</button>
+      </div>
+      <button type="button" class="playall" id="playAll"></button>
+    </div>
+  </div>
+
+  <p class="note" id="note" hidden>Questo telefono non ha una voce italiana. Installala nelle impostazioni di sistema (voce o sintesi vocale) oppure apri la pagina con Chrome o Safari.</p>
+
+  <main id="view"></main>
+
+  <footer>Roots · materiale di lessico per la sala. La voce è quella italiana del tuo telefono.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SECTIONS = [
+    { id: "sala", label: "Sala", type: "words", title: "Il ristorante e la sala",
+      intro: "Impara ogni parola con l’articolo: il, la, l’, lo.",
+      items: [
+        ["la sala", "Lavoro in sala."],
+        ["la cucina", "Il cuoco è in cucina."],
+        ["il tavolo", "Il tavolo numero 5 è libero."],
+        ["la sedia", "Porto una sedia in più."],
+        ["il seggiolone", "Serve un seggiolone per il bambino."],
+        ["il bancone / il bar", "Il caffè è pronto al bancone."],
+        ["l’ingresso", "I clienti aspettano all’ingresso."],
+        ["il guardaroba", "Il cappotto va al guardaroba."],
+        ["il bagno", "Il bagno è in fondo, a destra."],
+        ["la cassa", "Il conto si paga alla cassa."],
+        ["la terrazza / il dehors", "Preferite dentro o nel dehors?"],
+        ["la prenotazione", "Ho una prenotazione per due."]
+      ] },
+    { id: "tavola", label: "Tavola", type: "words", title: "Apparecchiare la tavola",
+      intro: "Ogni oggetto ha il suo posto. Prova con gli oggetti veri, dicendo il nome ad alta voce.",
+      items: [
+        ["la tovaglia", "Stendo la tovaglia sul tavolo."],
+        ["il tovagliolo", "Il tovagliolo va a sinistra."],
+        ["il piatto", "Un piatto piano e un piatto fondo."],
+        ["il coltello", "Il coltello va a destra."],
+        ["la forchetta", "La forchetta va a sinistra."],
+        ["il cucchiaio", "Il cucchiaio serve per la zuppa."],
+        ["il cucchiaino", "Il cucchiaino è per il caffè."],
+        ["il bicchiere", "Un bicchiere per l’acqua, uno per il vino."],
+        ["la bottiglia", "Una bottiglia d’acqua naturale."],
+        ["la caraffa", "Vi porto una caraffa d’acqua."],
+        ["il cestino del pane", "Il cestino del pane è sul tavolo."],
+        ["la saliera / il pepe", "Passo il sale e il pepe."],
+        ["l’olio e l’aceto", "L’olio e l’aceto sono sul tavolo."],
+        ["il tagliere", "I salumi arrivano sul tagliere."],
+        ["il vassoio", "Porto i bicchieri sul vassoio."]
+      ] },
+    { id: "ruoli", label: "Persone", type: "words", title: "Le persone e i ruoli",
+      intro: "Chi lavora in sala, chi in cucina, chi mangia.",
+      items: [
+        ["il cliente / la cliente", "Chi mangia al ristorante."],
+        ["il cameriere / la cameriera", "Chi serve i clienti in sala."],
+        ["il responsabile di sala", "Chi coordina la sala."],
+        ["il cuoco / la cuoca", "Chi cucina."],
+        ["lo chef", "Il capo della cucina."],
+        ["il lavapiatti", "Chi lava piatti e pentole."],
+        ["il barista", "Chi prepara caffè e bevande al bar."],
+        ["il sommelier", "L’esperto di vino."],
+        ["il collega / la collega", "Chi lavora con te."]
+      ] },
+    { id: "menu", label: "Menù", type: "words", title: "Il menù e le bevande",
+      intro: "Prima le parti del pasto italiano, nell’ordine in cui arrivano. Poi il menù e le bevande.",
+      items: [
+        ["l’antipasto", "Come antipasto, i salumi."],
+        ["il primo", "Come primo, i tortellini."],
+        ["il secondo", "Come secondo, la carne."],
+        ["il contorno", "Come contorno, le patate."],
+        ["il dolce", "Il dolce della casa."],
+        ["il menù", "Ecco il menù."],
+        ["la carta dei vini", "Vi porto la carta dei vini."],
+        ["il piatto del giorno", "Oggi il piatto del giorno è il risotto."],
+        ["l’acqua naturale / frizzante", "Acqua naturale o frizzante?"],
+        ["il vino rosso / bianco", "Un bicchiere di vino rosso."],
+        ["la birra", "Una birra alla spina."],
+        ["il caffè", "Un caffè, per favore."],
+        ["il pane", "Volete altro pane?"],
+        ["il coperto", "Il coperto costa due euro a persona."],
+        ["l’allergia", "Avete allergie o intolleranze?"],
+        ["vegetariano / vegano", "Questo piatto è vegetariano."],
+        ["senza glutine", "Abbiamo pasta senza glutine."]
+      ] },
+    { id: "verbi", label: "Verbi", type: "words", title: "Verbi utili",
+      intro: "Il verbo, e una frase per usarlo.",
+      items: [
+        ["accogliere", "Accolgo i clienti all’ingresso."],
+        ["accompagnare", "Vi accompagno al tavolo."],
+        ["apparecchiare", "Apparecchio il tavolo per quattro."],
+        ["portare", "Vi porto il menù."],
+        ["consigliare", "Vi consiglio i tortellini."],
+        ["prendere l’ordine", "Prendo l’ordine al tavolo 3."],
+        ["servire", "Servo il primo."],
+        ["versare", "Posso versare il vino?"],
+        ["sparecchiare", "Sparecchio il tavolo."],
+        ["pulire", "Pulisco il tavolo."],
+        ["portare il conto", "Vi porto subito il conto."],
+        ["pagare", "Come desiderate pagare?"]
+      ] },
+    { id: "frasi", label: "Frasi", type: "phrases", title: "Frasi per parlare con i clienti",
+      intro: "Ripeti ogni frase finché viene facile. Si usa il “voi” o il “lei” di cortesia.",
+      items: [
+        ["Buonasera! Avete prenotato?", "Accoglienza"],
+        ["Quante persone siete?", "Accoglienza"],
+        ["Prego, vi accompagno al tavolo.", "Accoglienza"],
+        ["Ecco il menù. Torno tra poco.", "Menù"],
+        ["Cosa vi porto da bere?", "Bevande"],
+        ["Acqua naturale o frizzante?", "Bevande"],
+        ["Avete già scelto?", "Ordine"],
+        ["Cosa prendete come primo?", "Ordine"],
+        ["Avete allergie o intolleranze?", "Ordine"],
+        ["Vi consiglio il piatto del giorno.", "Consiglio"],
+        ["Ecco a voi. Buon appetito!", "Servizio"],
+        ["Va tutto bene?", "Servizio"],
+        ["Desiderate altro?", "Servizio"],
+        ["Volete un dolce o un caffè?", "Dolce e caffè"],
+        ["Vi porto subito il conto.", "Conto"],
+        ["Pagate insieme o separati?", "Conto"],
+        ["Grazie, arrivederci e buona serata!", "Chiusura"],
+        ["Può ripetere, per favore?", "Se non capisci"],
+        ["Scusi, può parlare più piano?", "Se non capisci"],
+        ["Un attimo, chiedo in cucina.", "Se non sai"]
+      ],
+      dialogue: [
+        ["Cliente", "Buonasera, abbiamo prenotato a nome Rossi."],
+        ["Cameriera", "Buonasera! Prego, vi accompagno al tavolo."],
+        ["Cliente", "Grazie. Cosa ci consiglia?"],
+        ["Cameriera", "Vi consiglio i tortellini in brodo. Cosa vi porto da bere?"],
+        ["Cliente", "Una bottiglia d’acqua frizzante, per favore."]
+      ] },
+    { id: "ripasso", label: "Ripasso", type: "review", title: "Ripasso",
+      intro: "Parole che si assomigliano. Guarda l’immagine, ascolta, ripeti.",
+      groups: [
+        { title: "Tovaglia, tovagliolo, tovaglietta",
+          hint: "Si assomigliano nel suono, ma sono tre cose diverse: una grande, una piccola, una sotto il piatto.",
+          items: [
+            { w: "la tovaglia", ex: "La tovaglia copre tutto il tavolo.", svg: "tovaglia" },
+            { w: "il tovagliolo", ex: "Il tovagliolo serve per pulire la bocca.", svg: "tovagliolo" },
+            { w: "la tovaglietta", ex: "La tovaglietta sta sotto il piatto.", svg: "tovaglietta" }
+          ] },
+        { title: "Uva e uovo",
+          hint: "L’uva è un frutto. L’uovo lo fa la gallina: un uovo, due uova.",
+          items: [
+            { w: "l’uva", ex: "Mangio un grappolo d’uva.", svg: "uva" },
+            { w: "l’uovo", ex: "Faccio una frittata con due uova.", svg: "uovo" }
+          ] }
+      ] },
+    { id: "esercizi", label: "Esercizi", type: "exercises", title: "Esercizi" }
+  ];
+
+  var SVGS = {
+    tovaglia: '<svg viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="#F6F1E7"/><polygon points="32,36 88,36 106,58 14,58" fill="#E4EEF7" stroke="#6B93B8" stroke-width="2"/><rect x="14" y="58" width="92" height="38" fill="#CFE0EF" stroke="#6B93B8" stroke-width="2"/><path d="M14 96 q7.7 8 15.3 0 q7.7 8 15.3 0 q7.7 8 15.3 0 q7.7 8 15.3 0 q7.7 8 15.3 0 q7.7 8 15.4 0" fill="#CFE0EF" stroke="#6B93B8" stroke-width="2"/><path d="M38 58v34M60 58v34M82 58v34" stroke="#9DBBD6" stroke-width="2"/></svg>',
+    tovagliolo: '<svg viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="#F6F1E7"/><g transform="rotate(-6 60 60)"><rect x="29" y="30" width="66" height="62" rx="3" fill="#000000" opacity=".12"/><rect x="24" y="24" width="66" height="62" rx="3" fill="#E3E9F1" stroke="#8FA0B5" stroke-width="2"/><path d="M24 80h66" stroke="#8FA0B5" stroke-width="2"/><rect x="24" y="22" width="66" height="54" rx="3" fill="#FFFFFF" stroke="#8FA0B5" stroke-width="2"/><rect x="24" y="22" width="9" height="54" fill="#BCD0E6"/><rect x="81" y="22" width="9" height="54" fill="#BCD0E6"/><rect x="24" y="22" width="66" height="54" rx="3" fill="none" stroke="#8FA0B5" stroke-width="2"/><path d="M52 28v12M58 28v12M64 28v12M52 40q6 8 12 0M58 48v30" fill="none" stroke="#7A7A7A" stroke-width="3" stroke-linecap="round"/></g></svg>',
+    tovaglietta: '<svg viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="#F6F1E7"/><rect x="8" y="28" width="104" height="64" rx="10" fill="#000000" opacity=".1" transform="translate(2 3)"/><rect x="8" y="28" width="104" height="64" rx="10" fill="#A9CDA0" stroke="#5E8F55" stroke-width="2"/><rect x="13" y="33" width="94" height="54" rx="7" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="22" fill="#FFFFFF" stroke="#BBBBBB" stroke-width="2"/><circle cx="60" cy="60" r="13" fill="#F3F3F3" stroke="#DDDDDD" stroke-width="2"/><path d="M22 46v9M26 46v9M30 46v9M22 55q4 5 8 0M26 59v22" fill="none" stroke="#6F6F6F" stroke-width="2.2" stroke-linecap="round"/><path d="M94 46c5 4 5 16 0 22v13" fill="none" stroke="#6F6F6F" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    uva: '<svg viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="#F6F1E7"/><path d="M62 37V24" stroke="#6B4A2B" stroke-width="3" stroke-linecap="round"/><path d="M62 29C70 14 88 16 90 22C84 32 70 34 62 29Z" fill="#5E9B4E" stroke="#3F7336" stroke-width="2"/><g fill="#7B3F9E" stroke="#55256F" stroke-width="2"><circle cx="42" cy="48" r="10"/><circle cx="62" cy="48" r="10"/><circle cx="82" cy="48" r="10"/><circle cx="52" cy="65" r="10"/><circle cx="72" cy="65" r="10"/><circle cx="62" cy="82" r="10"/></g><g fill="#FFFFFF" opacity=".35"><circle cx="39" cy="45" r="3"/><circle cx="59" cy="45" r="3"/><circle cx="79" cy="45" r="3"/><circle cx="49" cy="62" r="3"/><circle cx="69" cy="62" r="3"/><circle cx="59" cy="79" r="3"/></g></svg>',
+    uovo: '<svg viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" fill="#F6F1E7"/><ellipse cx="60" cy="108" rx="26" ry="5" fill="#000000" opacity=".12"/><path d="M60 18C80 18 92 55 92 72C92 92 78 104 60 104C42 104 28 92 28 72C28 55 40 18 60 18Z" fill="#FBF3E2" stroke="#C8B48E" stroke-width="2.5"/><ellipse cx="48" cy="56" rx="6" ry="12" fill="#FFFFFF" opacity=".7" transform="rotate(15 48 56)"/></svg>'
+  };
+
+  var FILL = {
+    words: ["tovaglia", "forchetta", "caraffa", "conto", "menù", "prenotazione"],
+    sentences: [
+      ["Buonasera, avete una ", "prenotazione", "?"],
+      ["Ecco il ", "menù", ". Torno tra poco."],
+      ["La ", "forchetta", " va a sinistra del piatto."],
+      ["Vi porto una ", "caraffa", " d’acqua."],
+      ["Stendo la ", "tovaglia", " sul tavolo."],
+      ["Vi porto subito il ", "conto", "."]
+    ]
+  };
+
+  /* ---------- storage (optional convenience) ---------- */
+  function loadSpeed() { try { return localStorage.getItem("roots-speed") === "slow"; } catch (e) { return false; } }
+  function saveSpeed(v) { try { localStorage.setItem("roots-speed", v ? "slow" : "norm"); } catch (e) {} }
+
+  /* ---------- speech ---------- */
+  var synth = window.speechSynthesis || null;
+  var voice = null;
+  var slow = loadSpeed();
+  var runId = 0;
+
+  function pickVoice() {
+    if (!synth) return;
+    var vs = synth.getVoices() || [];
+    voice = null;
+    for (var i = 0; i < vs.length; i++) { if (vs[i].lang === "it-IT") { voice = vs[i]; break; } }
+    if (!voice) {
+      for (var j = 0; j < vs.length; j++) {
+        if (vs[j].lang && vs[j].lang.toLowerCase().indexOf("it") === 0) { voice = vs[j]; break; }
+      }
+    }
+  }
+  if (synth) {
+    pickVoice();
+    if (synth.addEventListener) synth.addEventListener("voiceschanged", pickVoice);
+  }
+  setTimeout(function () {
+    pickVoice();
+    var note = document.getElementById("note");
+    if (!synth || !voice) note.hidden = false;
+  }, 1500);
+
+  function clean(t) {
+    return t.replace(/\([^)]*\)/g, "").replace(/\s*\/\s*/g, ", ");
+  }
+
+  function speak(text, pitch) {
+    return new Promise(function (resolve) {
+      if (!synth) { resolve(); return; }
+      var u = new SpeechSynthesisUtterance(clean(text));
+      u.lang = "it-IT";
+      if (voice) u.voice = voice;
+      u.rate = slow ? 0.6 : 0.92;
+      u.pitch = pitch || 1;
+      u.onend = function () { resolve(); };
+      u.onerror = function () { resolve(); };
+      synth.speak(u);
+    });
+  }
+
+  function stopAll() {
+    runId++;
+    if (synth) synth.cancel();
+    clearPlaying();
+    setPlayAllLabel(false);
+  }
+
+  function clearPlaying() {
+    var els = document.querySelectorAll(".playing");
+    for (var i = 0; i < els.length; i++) els[i].classList.remove("playing");
+  }
+
+  function playOne(el, text, pitch) {
+    runId++;
+    var mine = runId;
+    if (synth) synth.cancel();
+    clearPlaying();
+    setPlayAllLabel(false);
+    if (el) el.classList.add("playing");
+    return speak(text, pitch).then(function () {
+      if (mine === runId && el) el.classList.remove("playing");
+    });
+  }
+
+  /* ---------- helpers ---------- */
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) {
+      for (var k in attrs) {
+        if (k === "class") el.className = attrs[k];
+        else if (k === "text") el.textContent = attrs[k];
+        else if (k.indexOf("on") === 0) el.addEventListener(k.slice(2), attrs[k]);
+        else el.setAttribute(k, attrs[k]);
+      }
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null) continue;
+      el.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return el;
+  }
+
+  var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  function speakerBtn(label, handler) {
+    var b = h("button", { type: "button", class: "speak", "aria-label": label });
+    b.innerHTML = ICON;
+    b.addEventListener("click", handler);
+    return b;
+  }
+
+  function shuffle(a) {
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ---------- state + rendering ---------- */
+  var current = "sala";
+  var view = document.getElementById("view");
+  var tabsEl = document.getElementById("tabs");
+  var playAllBtn = document.getElementById("playAll");
+  var toolsEl = document.getElementById("tools");
+
+  function sectionById(id) { for (var i = 0; i < SECTIONS.length; i++) if (SECTIONS[i].id === id) return SECTIONS[i]; return SECTIONS[0]; }
+
+  function renderTabs() {
+    tabsEl.innerHTML = "";
+    SECTIONS.forEach(function (s) {
+      var b = h("button", { type: "button", class: "tab", role: "tab", "aria-selected": String(s.id === current), text: s.label });
+      b.addEventListener("click", function () { stopAll(); current = s.id; renderTabs(); renderSection(); window.scrollTo(0, 0); });
+      tabsEl.appendChild(b);
+    });
+    var sel = tabsEl.querySelector('[aria-selected="true"]');
+    if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: "nearest", inline: "center" });
+  }
+
+  function setPlayAllLabel(running) {
+    playAllBtn.innerHTML = "";
+    playAllBtn.insertAdjacentHTML("beforeend", running ? "" : ICON.replace("<svg", '<svg width="20" height="20"'));
+    playAllBtn.appendChild(document.createTextNode(running ? "Ferma" : "Ascolta tutto"));
+    playAllBtn.setAttribute("data-running", running ? "1" : "0");
+  }
+
+  function renderSection() {
+    var s = sectionById(current);
+    view.innerHTML = "";
+    toolsEl.querySelector(".playall").style.display = (s.type === "exercises" || s.type === "review") ? "none" : "";
+    view.appendChild(h("h2", { text: s.title }));
+    if (s.intro) view.appendChild(h("p", { class: "intro", text: s.intro }));
+    setPlayAllLabel(false);
+
+    if (s.type === "exercises") { renderExercises(); return; }
+    if (s.type === "review") { renderReview(s); return; }
+
+    var ul = h("ul", { class: "rows" });
+    s.items.forEach(function (it) {
+      var mainEl, subEl;
+      var textMain = it[0], textSub = it[1];
+      mainEl = h("button", { type: "button", class: "main", text: textMain });
+      mainEl.addEventListener("click", function () { playOne(mainEl, textMain); });
+      var box = h("div", { class: "txt" }, mainEl);
+      if (s.type === "words") {
+        subEl = h("button", { type: "button", class: "sub", text: textSub });
+        subEl.addEventListener("click", function () { playOne(subEl, textSub); });
+      } else {
+        subEl = h("span", { class: "sub static", text: textSub });
+      }
+      box.appendChild(subEl);
+      it.mainEl = mainEl; it.subEl = subEl;
+      var li = h("li", null,
+        speakerBtn("Ascolta: " + textMain, function () { playOne(mainEl, textMain); }),
+        box);
+      ul.appendChild(li);
+    });
+    view.appendChild(ul);
+
+    if (s.dialogue) {
+      var d = h("section", { class: "dialogue" }, h("h3", { text: "Mini dialogo da recitare in coppia" }));
+      s.dialogue.forEach(function (ln) {
+        var who = ln[0], text = ln[1];
+        var b = h("button", { type: "button", class: "main", text: text });
+        var pitch = who === "Cameriera" ? 1.1 : 0.9;
+        b.addEventListener("click", function () { playOne(b, text, pitch); });
+        d.appendChild(h("div", { class: "line" },
+          h("span", { class: "who", text: who }),
+          b));
+        ln.el = b; ln.pitch = pitch;
+      });
+      view.appendChild(d);
+    }
+  }
+
+  function playAll() {
+    var s = sectionById(current);
+    if (playAllBtn.getAttribute("data-running") === "1") { stopAll(); return; }
+    var queue = [];
+    s.items.forEach(function (it) {
+      queue.push({ el: it.mainEl, text: it[0] });
+      if (s.type === "words") queue.push({ el: it.subEl, text: it[1] });
+    });
+    if (s.dialogue) s.dialogue.forEach(function (ln) { queue.push({ el: ln.el, text: ln[1], pitch: ln.pitch }); });
+    runId++;
+    var mine = runId;
+    if (synth) synth.cancel();
+    clearPlaying();
+    setPlayAllLabel(true);
+    (function next(i) {
+      if (mine !== runId) return;
+      if (i >= queue.length) { clearPlaying(); setPlayAllLabel(false); return; }
+      var q = queue[i];
+      clearPlaying();
+      if (q.el) { q.el.classList.add("playing"); if (q.el.scrollIntoView) q.el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+      speak(q.text, q.pitch).then(function () {
+        if (mine !== runId) return;
+        setTimeout(function () { next(i + 1); }, slow ? 700 : 350);
+      });
+    })(0);
+  }
+
+  playAllBtn.addEventListener("click", playAll);
+
+  function setSpeed(isSlow) {
+    slow = isSlow;
+    saveSpeed(slow);
+    document.getElementById("spNorm").setAttribute("aria-pressed", String(!slow));
+    document.getElementById("spSlow").setAttribute("aria-pressed", String(slow));
+  }
+  document.getElementById("spNorm").addEventListener("click", function () { setSpeed(false); });
+  document.getElementById("spSlow").addEventListener("click", function () { setSpeed(true); });
+  setSpeed(slow);
+
+  /* ---------- review (confusable words with pictures) ---------- */
+  function renderReview(s) {
+    s.groups.forEach(function (g) {
+      var sec = h("section", { class: "grp" });
+      sec.appendChild(h("h3", { text: g.title }));
+      if (g.hint) sec.appendChild(h("p", { class: "intro", text: g.hint }));
+      var grid = h("div", { class: "pics" });
+
+      g.items.forEach(function (it) {
+        var pic = h("button", { type: "button", class: "pic", "aria-label": it.w });
+        if (it.img) pic.appendChild(h("img", { src: it.img, alt: "" }));
+        else pic.innerHTML = SVGS[it.svg] || "";
+        var wordBtn = h("button", { type: "button", class: "main", text: it.w });
+        var exBtn = h("button", { type: "button", class: "sub", text: it.ex });
+        wordBtn.addEventListener("click", function () { playOne(wordBtn, it.w); });
+        exBtn.addEventListener("click", function () { playOne(exBtn, it.ex); });
+        pic.addEventListener("click", function () { playOne(pic, it.w); });
+        grid.appendChild(h("div", { class: "fig" }, pic, wordBtn, exBtn));
+      });
+
+      sec.appendChild(grid);
+      view.appendChild(sec);
+    });
+  }
+
+  /* ---------- exercises ---------- */
+  function renderExercises() {
+    /* A. fill in the blank */
+    var a = h("section", { class: "ex" });
+    a.appendChild(h("h3", { text: "A. Completa con la parola giusta" }));
+    a.appendChild(h("p", { class: "intro", text: "Scegli una parola per ogni frase. Dopo il controllo puoi ascoltare la frase." }));
+    var rows = [];
+    FILL.sentences.forEach(function (st, idx) {
+      var sel = h("select", { "aria-label": "Frase " + (idx + 1) });
+      sel.appendChild(h("option", { value: "", text: "…" }));
+      FILL.words.forEach(function (w) { sel.appendChild(h("option", { value: w, text: w })); });
+      var mark = h("span", { class: "mark" });
+      var row = h("div", { class: "sent" },
+        h("span", { class: "n", text: (idx + 1) + "." }),
+        h("span", { text: st[0] }), sel, h("span", { text: st[2] }), mark);
+      a.appendChild(row);
+      rows.push({ row: row, sel: sel, mark: mark, st: st });
+    });
+    var result = h("p", { class: "result" });
+    var check = h("button", { type: "button", class: "btn", text: "Controlla" });
+    check.addEventListener("click", function () {
+      var good = 0;
+      rows.forEach(function (r) {
+        r.row.classList.remove("ok", "no");
+        var ok = r.sel.value === r.st[1];
+        if (r.sel.value === "") { r.mark.textContent = ""; return; }
+        r.row.classList.add(ok ? "ok" : "no");
+        r.mark.textContent = ok ? "Giusto" : "Riprova";
+        if (ok) good++;
+        if (!r.hearBtn) {
+          var full = r.st[0] + r.st[1] + r.st[2];
+          r.hearBtn = speakerBtn("Ascolta la frase", function () { playOne(null, full); });
+          r.row.appendChild(r.hearBtn);
+        }
+      });
+      result.textContent = "Risposte giuste: " + good + " su " + rows.length + ".";
+    });
+    a.appendChild(h("div", { class: "row-btns" }, check));
+    a.appendChild(result);
+    view.appendChild(a);
+
+    /* B. listening quiz */
+    var pool = [];
+    SECTIONS.forEach(function (s) { if (s.type === "words") s.items.forEach(function (it) { pool.push(it[0]); }); });
+    var qWrap = h("section", { class: "quiz" });
+    qWrap.appendChild(h("h3", { text: "B. Ascolta e scegli" }));
+    var qBody = h("div");
+    qWrap.appendChild(qBody);
+    view.appendChild(qWrap);
+
+    var ROUNDS = 8;
+    var state = { n: 0, score: 0, order: [] };
+
+    function intro() {
+      qBody.innerHTML = "";
+      qBody.appendChild(h("p", { class: "intro", text: "Senti una parola e scegli quella giusta. Sono " + ROUNDS + " domande." }));
+      var go = h("button", { type: "button", class: "btn", text: "Inizia" });
+      go.addEventListener("click", function () { state = { n: 0, score: 0, order: shuffle(pool).slice(0, ROUNDS) }; question(); });
+      qBody.appendChild(go);
+    }
+
+    function question() {
+      qBody.innerHTML = "";
+      var answer = state.order[state.n];
+      var others = shuffle(pool.filter(function (w) { return w !== answer; })).slice(0, 3);
+      var opts = shuffle(others.concat([answer]));
+      qBody.appendChild(h("div", { class: "progress", text: "Domanda " + (state.n + 1) + " di " + ROUNDS }));
+      qBody.appendChild(h("p", { class: "q", text: "Quale parola senti?" }));
+      var again = h("button", { type: "button", class: "btn ghost", text: "Riascolta" });
+      again.addEventListener("click", function () { playOne(null, answer); });
+      qBody.appendChild(again);
+      var box = h("div", { class: "opts" });
+      var done = false;
+      opts.forEach(function (w) {
+        var b = h("button", { type: "button", class: "opt", text: w });
+        b.addEventListener("click", function () {
+          if (done) return;
+          done = true;
+          var ok = w === answer;
+          if (ok) state.score++;
+          b.classList.add(ok ? "ok" : "no");
+          if (!ok) {
+            var all = box.querySelectorAll(".opt");
+            for (var i = 0; i < all.length; i++) if (all[i].textContent === answer) all[i].classList.add("ok");
+          }
+          var nextBtn = h("button", { type: "button", class: "btn", text: state.n + 1 < ROUNDS ? "Avanti" : "Vedi il risultato" });
+          nextBtn.addEventListener("click", function () {
+            state.n++;
+            if (state.n < ROUNDS) { question(); playOne(null, state.order[state.n]); }
+            else finish();
+          });
+          qBody.appendChild(h("div", { class: "row-btns" }, nextBtn));
+        });
+        box.appendChild(b);
+      });
+      qBody.appendChild(box);
+    }
+
+    function finish() {
+      qBody.innerHTML = "";
+      qBody.appendChild(h("p", { class: "q", text: "Risultato: " + state.score + " su " + ROUNDS + "." }));
+      var re = h("button", { type: "button", class: "btn", text: "Ricomincia" });
+      re.addEventListener("click", intro);
+      qBody.appendChild(re);
+    }
+
+    intro();
+  }
+
+  /* first question plays on Inizia too */
+  document.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t && t.classList && t.classList.contains("btn") && t.textContent === "Inizia") {
+      setTimeout(function () {
+        var q = document.querySelector(".quiz .btn.ghost");
+        if (q) q.click();
+      }, 0);
+    }
+  });
+
+  renderTabs();
+  renderSection();
+})();
+</script>
+</body>
+</html>
