@@ -395,26 +395,26 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.92rem; }
     { id: "lezione-6-novembre", label: "Lezione 6 novembre", type: "phrases", title: "Lezione 6 novembre",
       intro: "Tocca ogni frase per ascoltarla per intero. Poi prova a ripeterla ad alta voce.",
       items: [
-        ["La tartare è un piatto con carne o pesce crudo, tagliato in piccoli pezzi.", "Tartare"],
-        ["Il carpaccio è un piatto preparato con fettine molto sottili di carne, pesce o verdure.", "Carpaccio"],
-        ["Il ceviche è un piatto con pesce crudo condito con succo di lime o limone.", "Ceviche"],
-        ["Il lardo e lo strutto sono il grasso del maiale.", "Lardo e strutto"],
-        ["Le cipolle caramellizzate hanno un sapore dolce.", "Caramellizzato"],
-        ["Il cinghiale è un animale selvatico.", "Selvatico"],
-        ["La selvaggina è la carne di animali selvatici.", "Selvaggina"]
+        ["La <strong>tartare</strong> è un piatto con carne o pesce crudo, tagliato in piccoli pezzi.", "Tartare"],
+        ["Il <strong>carpaccio</strong> è un piatto preparato con fettine molto sottili di carne, pesce o verdure.", "Carpaccio"],
+        ["Il <strong>ceviche</strong> è un piatto con pesce crudo condito con succo di lime o limone.", "Ceviche"],
+        ["Il <strong>lardo</strong> e lo strutto sono il grasso del maiale.", "Lardo e strutto"],
+        ["Le <strong>cipolle caramellizzate </strong>hanno un sapore dolce.", "Caramellizzato"],
+        ["Il <strong>cinghiale</strong> è un animale selvatico</strong>.", "Selvatico"],
+        ["La <strong>selvaggina</strong> è la carne di animali selvatici.", "Selvaggina"]
       ],
       groups: [
         { title: "Oca e anatra",
           hint: "Sembrano simili, ma l’oca di solito è più grande e ha il collo più lungo dell’anatra.",
           items: [
-            { w: "l’oca", ex: "L’oca è più grande dell’anatra.", svg: "img/oca.jpg" },
-            { w: "l’anatra", ex: "L’anatra ha il collo più corto dell’oca.", svg: "img/anatra.jpg" }
+            { w: "l’oca", ex: "L’oca è più grande dell’anatra.", img: "img/oca.jpg" },
+            { w: "l’anatra", ex: "L’anatra ha il collo più corto dell’oca.", img: "img/anatra.jpg" }
           ] },
         { title: "Gambero e mazzancolla",
           hint: "La mazzancolla è un crostaceo simile al gambero, ma di solito è più grande e più carnosa.",
           items: [
-            { w: "il gambero", ex: "Il gambero è più piccolo della mazzancolla.", svg: "gambero" },
-            { w: "la mazzancolla", ex: "La mazzancolla è più grande del gambero.", svg: "mazzancolla" }
+            { w: "il gambero", ex: "Il gambero è più piccolo della mazzancolla.", img: "img/gambero.jpg" },
+            { w: "la mazzancolla", ex: "La mazzancolla è più grande del gambero.", img: "img/mazzancolle.jpg" }
           ] }
       ] },
     { id: "ripasso", label: "Ripasso", type: "review", title: "Ripasso",
@@ -503,11 +503,12 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.92rem; }
   }, 1500);
 
   function clean(t) {
-    return t.replace(/\([^)]*\)/g, "")
-      .replace(/\s*\/\s*/g, ", ")
-      // La parola rimane scritta "tartare", ma la voce non legge la e finale.
-      .replace(/\btartare\b/gi, "tartàr");
-  }
+  return t
+    .replace(/<[^>]*>/g, "")
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\s*\/\s*/g, ", ")
+    .replace(/\btartare\b/gi, "tartàr");
+}
 
   function speak(text, pitch) {
     return new Promise(function (resolve) {
@@ -642,6 +643,7 @@ footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.92rem; }
       var mainEl, subEl;
       var textMain = it[0], textSub = it[1];
       mainEl = h("button", { type: "button", class: "main", text: textMain });
+      mainEl.innerHTML = textMain;
       mainEl.addEventListener("click", function () { playOne(mainEl, textMain); });
       var box = h("div", { class: "txt" }, mainEl);
       if (s.type === "words") {
